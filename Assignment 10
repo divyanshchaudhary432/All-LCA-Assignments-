@@ -1,1 +1,65 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 
+/* Check for leap year using Gregorian rules */
+int isLeap(int year)
+{
+    return (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0);
+}
+
+int main()
+{
+    int year, month, day, i, startDay;
+    int days[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+    char *names[] = {"January", "February", "March", "April", "May", "June",
+                     "July", "August", "September", "October", "November", "December"};
+    struct tm t;
+
+    /* Input year */
+    printf("Enter year: ");
+    scanf("%d", &year);
+
+    if (year < 1901)
+    {
+        printf("Error: Please enter a year from 1901 onwards.\n");
+        exit(1);
+    }
+
+    /* Check for leap year rules */
+    if (isLeap(year))
+        days[1] = 29;
+
+    /* Generate calendar month-wise */
+    for (month = 0; month < 12; month++)
+    {
+        /* Find the weekday of the 1st of this month (0 = Sunday) */
+        t = (struct tm){0};
+        t.tm_year = year - 1900;
+        t.tm_mon  = month;
+        t.tm_mday = 1;
+        t.tm_hour = 12;
+        mktime(&t);
+        startDay = t.tm_wday;
+
+        /* Display calendar */
+        printf("\n      %s %d\n", names[month], year);
+        printf("Su Mo Tu We Th Fr Sa\n");
+
+        /* Spaces before the first date */
+        for (i = 0; i < startDay; i++)
+            printf("   ");
+
+        for (day = 1; day <= days[month]; day++)
+        {
+            printf("%2d ", day);
+
+            /* Move to next line after Saturday */
+            if ((startDay + day) % 7 == 0)
+                printf("\n");
+        }
+        printf("\n");
+    }
+
+    return 0;
+}
